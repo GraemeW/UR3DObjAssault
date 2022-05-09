@@ -16,7 +16,7 @@ void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetActorLocation(InitialLocation);
+	InitialLocation = GetActorLocation();
 	LastLocation = InitialLocation;
 	DistanceMoved = 0;
 }
@@ -26,27 +26,27 @@ void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector CurrentLocation = FVector(GetActorLocation());
-	CurrentLocation.Y = CurrentLocation.Y + GetVelocity(DeltaTime);
+	FVector CurrentLocation = GetActorLocation();
+	CurrentLocation = CurrentLocation + GetPositionShift(DeltaTime);
 	SetActorLocation(CurrentLocation);
 
 	UpdateDistanceMoved(CurrentLocation);
 }
 
-float AMovingPlatform::GetVelocity(float DeltaTime)
+FVector AMovingPlatform::GetPositionShift(float DeltaTime)
 {
-	float Velocity = PlatformSpeed * DeltaTime;
-	if (!MoveForward) { Velocity *= -1; }
-	return Velocity;
+	return MoveForward ? PlatformSpeed * DeltaTime : PlatformSpeed * DeltaTime * -1;
 }
 
 void AMovingPlatform::UpdateDistanceMoved(FVector CurrentLocation)
 {
-	DistanceMoved += (CurrentLocation - LastLocation).Length();
+	DistanceMoved += FVector::Distance(CurrentLocation, LastLocation);
 	if (DistanceMoved > TurnAroundDistance / 2)
 	{
 		MoveForward = !MoveForward;
-		DistanceMoved = -TurnAroundDistance / 2;
+		float DistanceRemaining = DistanceMoved - TurnAroundDistance / 2;
+		DistanceMoved = -TurnAroundDistance / 2 - DistanceRemaining;
 	}
+	LastLocation = CurrentLocation;
 }
 

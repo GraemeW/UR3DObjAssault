@@ -23,25 +23,25 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
 	void UpdateDistanceMoved(FVector CurrentLocation);
+	FVector GetPositionShift(float DeltaTime);
 
-	float GetVelocity(float DeltaTime);
+	UPROPERTY(EditAnywhere, Category="Moving Platform")
+	FVector PlatformSpeed = FVector(0, 1000, 0);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Moving Platform")
+	float TurnAroundDistance = 3000;
+
+	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
 	FVector InitialLocation = FVector(1.0, 2.0, 3.0);
 
-	UPROPERTY(EditAnywhere)
-	float PlatformSpeed = 1;
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
 	bool MoveForward = true;
 
-	UPROPERTY(EditAnywhere)
-	float TurnAroundDistance = 100;
-
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
 	float DistanceMoved = 0;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
 	FVector LastLocation = FVector(0, 0, 0);
 };
