@@ -24,7 +24,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	void MovePlatform(FVector& CurrentLocation, float DeltaTime);
+	void RotatePlatform(float DeltaTime);
 	void UpdateDistanceMoved(FVector CurrentLocation);
+	bool ShouldPlatformReturn();
 	FVector GetPositionShift(float DeltaTime);
 
 	UPROPERTY(EditAnywhere, Category="Moving Platform")

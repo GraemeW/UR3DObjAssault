@@ -19,6 +19,9 @@ void AMovingPlatform::BeginPlay()
 	InitialLocation = GetActorLocation();
 	LastLocation = InitialLocation;
 	DistanceMoved = 0;
+
+	FString Name = GetName();
+	UE_LOG(LogTemp, Display, TEXT("BeginPlay:  %s"), *Name);
 }
 
 // Called every frame
@@ -27,10 +30,29 @@ void AMovingPlatform::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FVector CurrentLocation = GetActorLocation();
+	MovePlatform(CurrentLocation, DeltaTime);
+	UpdateDistanceMoved(CurrentLocation);
+	RotatePlatform(DeltaTime);
+}
+
+void AMovingPlatform::MovePlatform(FVector& CurrentLocation, float DeltaTime)
+{
 	CurrentLocation = CurrentLocation + GetPositionShift(DeltaTime);
 	SetActorLocation(CurrentLocation);
+}
 
-	UpdateDistanceMoved(CurrentLocation);
+void AMovingPlatform::RotatePlatform(float DeltaTime)
+{
+	if (ShouldPlatformReturn())
+	{
+		MoveForward = !MoveForward;
+		float DistanceRemaining = DistanceMoved - TurnAroundDistance / 2;
+
+		FString Name = GetName();
+		UE_LOG(LogTemp, Display, TEXT("%s overshot the move distance by %f, compensating"), *Name, DistanceRemaining);
+
+		DistanceMoved = -TurnAroundDistance / 2 - DistanceRemaining;
+	}
 }
 
 FVector AMovingPlatform::GetPositionShift(float DeltaTime)
@@ -41,12 +63,11 @@ FVector AMovingPlatform::GetPositionShift(float DeltaTime)
 void AMovingPlatform::UpdateDistanceMoved(FVector CurrentLocation)
 {
 	DistanceMoved += FVector::Distance(CurrentLocation, LastLocation);
-	if (DistanceMoved > TurnAroundDistance / 2)
-	{
-		MoveForward = !MoveForward;
-		float DistanceRemaining = DistanceMoved - TurnAroundDistance / 2;
-		DistanceMoved = -TurnAroundDistance / 2 - DistanceRemaining;
-	}
 	LastLocation = CurrentLocation;
+}
+
+bool AMovingPlatform::ShouldPlatformReturn()
+{
+	return (DistanceMoved > TurnAroundDistance / 2);
 }
 
