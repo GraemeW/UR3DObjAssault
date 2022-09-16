@@ -20,8 +20,7 @@ void AMovingPlatform::BeginPlay()
 	LastLocation = InitialLocation;
 	DistanceMoved = 0;
 
-	FString Name = GetName();
-	UE_LOG(LogTemp, Display, TEXT("BeginPlay:  %s"), *Name);
+	UE_LOG(LogTemp, Display, TEXT("BeginPlay:  %s"), *GetName());
 }
 
 // Called every frame
@@ -32,32 +31,34 @@ void AMovingPlatform::Tick(float DeltaTime)
 	FVector CurrentLocation = GetActorLocation();
 	MovePlatform(CurrentLocation, DeltaTime);
 	UpdateDistanceMoved(CurrentLocation);
+	FlipPlatformDirection();
 	RotatePlatform(DeltaTime);
 }
 
 void AMovingPlatform::MovePlatform(FVector& CurrentLocation, float DeltaTime)
 {
+	UE_LOG(LogTemp, Display, TEXT("%s is moving..."), *GetName());
 	CurrentLocation = CurrentLocation + GetPositionShift(DeltaTime);
 	SetActorLocation(CurrentLocation);
 }
 
-void AMovingPlatform::RotatePlatform(float DeltaTime)
+void AMovingPlatform::FlipPlatformDirection()
 {
 	if (ShouldPlatformReturn())
 	{
 		MoveForward = !MoveForward;
 		float DistanceRemaining = DistanceMoved - TurnAroundDistance / 2;
 
-		FString Name = GetName();
-		UE_LOG(LogTemp, Display, TEXT("%s overshot the move distance by %f, compensating"), *Name, DistanceRemaining);
+		UE_LOG(LogTemp, Display, TEXT("%s overshot the move distance by %f, compensating"), *GetName(), DistanceRemaining);
 
 		DistanceMoved = -TurnAroundDistance / 2 - DistanceRemaining;
 	}
 }
 
-FVector AMovingPlatform::GetPositionShift(float DeltaTime)
+void AMovingPlatform::RotatePlatform(float DeltaTime)
 {
-	return MoveForward ? PlatformSpeed * DeltaTime : PlatformSpeed * DeltaTime * -1;
+	UE_LOG(LogTemp, Display, TEXT("%s is rotating..."), *GetName());
+	AddActorLocalRotation(RotationVelocity * DeltaTime);
 }
 
 void AMovingPlatform::UpdateDistanceMoved(FVector CurrentLocation)
@@ -66,7 +67,12 @@ void AMovingPlatform::UpdateDistanceMoved(FVector CurrentLocation)
 	LastLocation = CurrentLocation;
 }
 
-bool AMovingPlatform::ShouldPlatformReturn()
+FVector AMovingPlatform::GetPositionShift(float DeltaTime) const
+{
+	return MoveForward ? PlatformSpeed * DeltaTime : PlatformSpeed * DeltaTime * -1;
+}
+
+bool AMovingPlatform::ShouldPlatformReturn() const
 {
 	return (DistanceMoved > TurnAroundDistance / 2);
 }

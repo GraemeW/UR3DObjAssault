@@ -25,26 +25,31 @@ public:
 
 private:
 	void MovePlatform(FVector& CurrentLocation, float DeltaTime);
-	void RotatePlatform(float DeltaTime);
 	void UpdateDistanceMoved(FVector CurrentLocation);
-	bool ShouldPlatformReturn();
-	FVector GetPositionShift(float DeltaTime);
+	void FlipPlatformDirection();
+	void RotatePlatform(float DeltaTime);
 
-	UPROPERTY(EditAnywhere, Category="Moving Platform")
+	FVector GetPositionShift(float DeltaTime) const;
+	bool ShouldPlatformReturn() const;
+
+	UPROPERTY(EditAnywhere, Category="Moving")
 	FVector PlatformSpeed = FVector(0, 1000, 0);
 
-	UPROPERTY(EditAnywhere, Category = "Moving Platform")
+	UPROPERTY(EditAnywhere, Category = "Moving")
 	float TurnAroundDistance = 3000;
 
-	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
+	UPROPERTY(EditAnywhere, Category = "Rotation")
+	FRotator RotationVelocity;
+
+	UPROPERTY(VisibleAnywhere, Category = "Moving State")
 	FVector InitialLocation = FVector(1.0, 2.0, 3.0);
 
-	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
+	UPROPERTY(VisibleAnywhere, Category = "Moving State")
 	bool MoveForward = true;
 
-	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
+	UPROPERTY(VisibleAnywhere, Category = "Moving State")
 	float DistanceMoved = 0;
 
-	UPROPERTY(VisibleAnywhere, Category = "Moving Platform")
+	UPROPERTY(VisibleAnywhere, Category = "Moving State")
 	FVector LastLocation = FVector(0, 0, 0);
 };
